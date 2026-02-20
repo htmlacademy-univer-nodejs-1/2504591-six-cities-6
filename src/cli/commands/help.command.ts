@@ -13,6 +13,8 @@ export class HelpCommand implements ICommand {
   --help: Show this help message
   --version: Show the current version of the application
   --import <path>: Import data from the specified file path
+  --generate <n> <filepath> <url>: Generate n offers and save to the specified file path,
+    using data from the specified URL
       `
       )
     );

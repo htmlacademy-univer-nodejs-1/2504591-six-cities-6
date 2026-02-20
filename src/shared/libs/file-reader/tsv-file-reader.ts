@@ -1,14 +1,39 @@
-import { readFileSync } from 'node:fs';
+import { createReadStream } from 'node:fs';
 import { IFileReader } from './file-reader.interface.js';
-import { Offer } from '../../types/offer.type.js';
+import { Offer } from '../../types/index.js';
+import { createOffer } from '../../helpers/index.js';
+import { EventEmitter } from 'node:events';
 
-export class TsvFileReader implements IFileReader {
+const CHUNK_SIZE = 16384;
+export class TsvFileReader extends EventEmitter implements IFileReader {
   private rawData = '';
 
-  constructor(private filePath: string) {}
+  constructor(private filePath: string) {
+    super();
+  }
 
-  public read(): void {
-    this.rawData = readFileSync(this.filePath, 'utf-8');
+  public async read(): Promise<void> {
+    const readStream = createReadStream(this.filePath, {
+      highWaterMark: CHUNK_SIZE,
+      encoding: 'utf-8',
+    });
+
+    let remainingData = '';
+    let nextLinePosition = -1;
+    let importedRowCount = 0;
+
+    for await (const chunk of readStream) {
+      remainingData += chunk.toString();
+
+      while ((nextLinePosition = remainingData.indexOf('\n')) >= 0) {
+        const line = remainingData.slice(0, nextLinePosition + 1).trim();
+        remainingData = remainingData.slice(++nextLinePosition);
+        importedRowCount++;
+        this.emit('line', line);
+      }
+
+      this.emit('end', importedRowCount);
+    }
   }
 
   public toArray(): Offer[] {
@@ -18,53 +43,6 @@ export class TsvFileReader implements IFileReader {
     return this.rawData
       .split('\n')
       .filter((row) => row.trim().length > 0)
-      .map((line) => {
-        const [
-          name,
-          description,
-          date,
-          city,
-          preview,
-          images,
-          isPremium,
-          isFavorite,
-          rating,
-          type,
-          rooms,
-          guests,
-          price,
-          features,
-          user,
-          commentCount,
-          coordinates,
-        ] = line.split('\t');
-        const [username, email, avatar, password] = user.split(';');
-        return {
-          name,
-          description,
-          date: new Date(date),
-          city,
-          preview,
-          images: images.split(';'),
-          isPremium: isPremium === 'true',
-          isFavorite: isFavorite === 'true',
-          rating: parseFloat(rating),
-          type,
-          rooms: parseInt(rooms, 10),
-          guests: parseInt(guests, 10),
-          price: parseInt(price, 10),
-          features: features.split(';'),
-          user: {
-            name: username,
-            email,
-            avatar,
-            password,
-          },
-          commentCount: parseInt(commentCount, 10),
-          coordinates: coordinates
-            .split(';')
-            .map((coord) => parseFloat(coord)) as [number, number],
-        };
-      });
+      .map((line) => createOffer(line));
   }
 }

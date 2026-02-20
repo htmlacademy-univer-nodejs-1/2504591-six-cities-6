@@ -2,6 +2,7 @@ import { resolve } from 'node:path';
 import { ICommand } from './command.interface.js';
 import { readFileSync } from 'node:fs';
 import chalk from 'chalk';
+import { getErrorMessage } from '../../shared/helpers/index.js';
 
 type PackageJSONConfig = {
   version: string;
@@ -26,7 +27,7 @@ export class VersionCommand implements ICommand {
       console.log(`Current version: ${chalk.green(version)}`);
     } catch (error) {
       console.error(
-        chalk.redBright(`Error reading version: ${(error as Error).message}`)
+        chalk.redBright(`Error reading version: ${getErrorMessage(error)}`)
       );
     }
   }

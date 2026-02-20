@@ -14,15 +14,17 @@
     "lint": "eslint src/ --ext .ts",
     "compile": "tsc -p tsconfig.json",
     "clean": "rimraf dist",
-    "ts": "tsx"
+    "ts": "tsx",
+    "json-server": "json-server ./mocks/mock-server-data.json --port 3000"
   },
   "devDependencies": {
-    "@types/node": "^18.16.3",
+    "@types/node": "^18.19.130",
     "@typescript-eslint/eslint-plugin": "5.46.0",
     "@typescript-eslint/parser": "5.46.0",
     "eslint": "8.39.0",
     "eslint-config-htmlacademy": "9.1.1",
     "eslint-config-prettier": "^10.1.8",
+    "json-server": "^1.0.0-beta.6",
     "rimraf": "3.0.2",
     "ts-node": "10.9.1",
     "tsx": "^4.21.0",
@@ -37,6 +39,7 @@
     "plugin:prettier/recommended"
   ],
   "dependencies": {
-    "chalk": "^5.6.2"
+    "chalk": "^5.6.2",
+    "dayjs": "^1.11.19"
   }
 }

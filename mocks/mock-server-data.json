@@ -1,0 +1,60 @@
+{
+  "api": {
+    "titles": [
+      "Epstein Island.",
+      "Beautiful & luxurious studio at great location",
+      "Wood and stone place",
+      "Canal View Prinsengracht",
+      "Nice, cozy, warm big bed apartment"
+    ],
+    "descriptions": [
+      "A quiet cozy and comfortable apartment in the center of the city.",
+      "This is a place for dreamers to reset, reflect, and create.",
+      "Peaceful studio in the most wanted area in town."
+    ],
+    "cities": [
+      "Paris",
+      "Cologne",
+      "Brussels",
+      "Amsterdam",
+      "Hamburg",
+      "Dusseldorf"
+    ],
+    "previewImages": [
+      "img/apartment-01.jpg",
+      "img/apartment-02.jpg",
+      "img/apartment-03.jpg"
+    ],
+    "photos": [
+      "img/room.jpg",
+      "img/apartment-01.jpg",
+      "img/apartment-02.jpg",
+      "img/apartment-03.jpg",
+      "img/studio-01.jpg"
+    ],
+    "types": ["Apartment", "Room", "House", "Hotel"],
+    "features": [
+      "Breakfast",
+      "Air conditioning",
+      "Laptop friendly workspace",
+      "Baby seat",
+      "Washer",
+      "Towels",
+      "Fridge"
+    ],
+    "users": [
+      {
+        "name": "Ivan",
+        "email": "ivan@example.com",
+        "avatar": "img/avatar-max.jpg",
+        "password": "secret_password"
+      },
+      {
+        "name": "Angelina",
+        "email": "angelina@example.com",
+        "avatar": "img/avatar-angelina.jpg",
+        "password": "secret_password"
+      }
+    ]
+  }
+}
