@@ -47,13 +47,15 @@
         "name": "Ivan",
         "email": "ivan@example.com",
         "avatar": "img/avatar-max.jpg",
-        "password": "secret_password"
+        "password": "secret_password",
+        "type": "Standart"
       },
       {
         "name": "Angelina",
         "email": "angelina@example.com",
         "avatar": "img/avatar-angelina.jpg",
-        "password": "secret_password"
+        "password": "secret_password",
+        "type": "Pro"
       }
     ]
   }

@@ -3,6 +3,8 @@ import {
   OfferCityType,
   OfferFeatureType,
   OfferType,
+  UserType,
+  UserTypeEnum,
 } from '../types/index.js';
 import {
   OfferTypeEmum,
@@ -30,6 +32,8 @@ const isOfferCityType = (city: string): city is OfferCityType =>
 const isOfferFeatureType = (feature: string): feature is OfferFeatureType =>
   includes(Object.values(OfferFeatureEnum), feature);
 
+const isUserType = (type: string): type is UserType =>
+  includes(Object.values(UserTypeEnum), type);
 export const createOffer = (line: string): Offer => {
   const [
     name,
@@ -49,7 +53,7 @@ export const createOffer = (line: string): Offer => {
     user,
     coordinates,
   ] = line.split('\t');
-  const [username, email, avatar, password] = user.split(';');
+  const [username, email, avatar, password, userType] = user.split(';');
   const coord = coordinates.split(';').map(Number);
   const featuresArray = features.split(';');
 
@@ -57,7 +61,8 @@ export const createOffer = (line: string): Offer => {
     !isCoordinatesValid(coord) ||
     !isOfferType(type) ||
     !isOfferCityType(city) ||
-    !featuresArray.every(isOfferFeatureType)
+    !featuresArray.every(isOfferFeatureType) ||
+    !isUserType(userType)
   ) {
     throw new Error(`Invalid offer data: ${line}`);
   }
@@ -82,6 +87,7 @@ export const createOffer = (line: string): Offer => {
       email,
       avatar,
       password,
+      type: userType,
     },
     coordinates: coord,
   };
