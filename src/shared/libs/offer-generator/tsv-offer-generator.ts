@@ -21,10 +21,12 @@ const isUser = (user: unknown): user is User =>
   'email' in user &&
   'avatar' in user &&
   'password' in user &&
+  'type' in user &&
   typeof user.name === 'string' &&
   typeof user.email === 'string' &&
   typeof user.avatar === 'string' &&
-  typeof user.password === 'string';
+  typeof user.password === 'string' &&
+  typeof user.type === 'string';
 
 const isUserArray = (users: unknown): users is User[] =>
   Array.isArray(users) && users.every(isUser);
@@ -75,7 +77,7 @@ export class TSVOfferGenerator implements IOfferGenerator {
       guests,
       price,
       features.join(';'),
-      `${user.name};${user.email};${user.avatar};${user.password}`,
+      `${user.name};${user.email};${user.avatar};${user.password};${user.type}`,
       `${coordinates[0]};${coordinates[1]}`,
     ].join('\t');
   }

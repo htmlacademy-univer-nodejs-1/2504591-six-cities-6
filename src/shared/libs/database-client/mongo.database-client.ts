@@ -1,0 +1,58 @@
+import { inject, injectable } from 'inversify';
+import { IDatabaseClient } from './database-client.interface.js';
+import { Component } from '../../types/index.js';
+import { ILogger } from '../logger/index.js';
+import mongoose from 'mongoose';
+import { setTimeout } from 'node:timers/promises';
+
+const RETRY_COUNT = 5;
+const RETRY_TIMEOUT = 1000;
+
+@injectable()
+export class MongoDatabaseClient implements IDatabaseClient {
+  private _isConnected = false;
+
+  constructor(@inject(Component.Logger) private readonly logger: ILogger) {}
+
+  public get isConnected(): boolean {
+    return this.isConnected === true;
+  }
+
+  public async connect(url: string): Promise<void> {
+    if (this._isConnected) {
+      throw new Error('MongoDB client already connected');
+    }
+    this.logger.info('Trying to connect to MongoDB…');
+
+    let attempt = 0;
+    while (attempt < RETRY_COUNT) {
+      try {
+        await mongoose.connect(url);
+        this._isConnected = true;
+        this.logger.info('Database connection established.');
+        return;
+      } catch (error) {
+        attempt++;
+        this.logger.error(
+          `Failed to connect. Attempt ${attempt}`,
+          error as Error
+        );
+        await setTimeout(RETRY_TIMEOUT);
+      }
+    }
+    this.logger.error(
+      `Unable to connect after ${RETRY_COUNT} attempts`,
+      new Error()
+    );
+  }
+
+  public async disconnect(): Promise<void> {
+    if (!this._isConnected) {
+      throw new Error('Not connected to the database');
+    }
+
+    await mongoose.disconnect();
+    this._isConnected = false;
+    this.logger.info('Database connection closed.');
+  }
+}
