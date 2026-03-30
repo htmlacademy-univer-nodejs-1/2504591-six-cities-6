@@ -1,0 +1,628 @@
+openapi: 3.1.0
+info:
+  title: Specification
+  version: 1.0.0
+  description: API проекта "Шесть городов".
+
+servers:
+  - url: https://localhost:3000
+    description: Локальный сервер разработки
+
+tags:
+  - name: offers
+    description: Действия с объявлениями.
+  - name: users
+    description: Действия с пользователем.
+  - name: comments
+    description: Действия с комментариями.
+  - name: auth
+    description: Авторизация, регистрация и управление токенами.
+
+paths:
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Регистрация пользователя
+      description: Регистрация нового пользователя в системе.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '201':
+          description: Пользователь успешно зарегистрирован
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/id'
+                  - $ref: '#/components/schemas/createUser'
+        '400':
+          description: Некорректные данные для регистрации
+        '409':
+          description: Пользователь с таким email уже существует
+
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Авторизация пользователя
+      description: Вход пользователя в систему.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  maxLength: 255
+                  example: 'user@example.com'
+                password:
+                  type: string
+                  format: password
+                  minLength: 6
+                  maxLength: 12
+                  example: 'password123'
+      responses:
+        '200':
+          description: Пользователь успешно авторизован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+        '400':
+          description: Некорректные данные для авторизации
+
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Выход пользователя из системы
+      description: Выход пользователя из системы и удаление его refresh-токена.
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Пользователь успешно вышел из системы
+        '401':
+          description: Пользователь не авторизован
+
+  /auth/refresh:
+    post:
+      tags:
+        - auth
+      summary: Обновление токена
+      description: Получение нового токена доступа с помощью refresh-токена.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/token'
+      responses:
+        '200':
+          description: Новый токен доступа успешно получен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/token'
+        '401':
+          description: Не авторизован
+
+  /users/me:
+    get:
+      tags:
+        - users
+      summary: Получение информации о текущем пользователе
+      description: Получение информации о текущем аутентифицированном пользователе.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Информация о пользователе успешно получена
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/id'
+                  - $ref: '#/components/schemas/createUser'
+        '401':
+          description: Пользователь не авторизован
+
+  /users/me/favorites:
+    get:
+      tags:
+        - offers
+      summary: Получение списка избранных объявлений
+      description: Получение списка всех объявлений, добавленных пользователем в избранное.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Список избранных объявлений успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 1000
+                items:
+                  allOf:
+                    - $ref: '#/components/schemas/id'
+                    - $ref: '#/components/schemas/offer'
+        '401':
+          description: Пользователь не авторизован
+
+  /offers:
+    get:
+      tags:
+        - offers
+      summary: Получение списка объявлений
+      description: Получение списка всех объявлений с возможностью фильтрации и сортировки.
+      parameters:
+        - name: limit
+          in: query
+          description: Ограничение количества
+          schema:
+            type: integer
+            default: 60
+            maximum: 1000
+      responses:
+        '200':
+          description: Список объявлений успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 1000
+                items:
+                  $ref: '#/components/schemas/offer'
+    post:
+      tags:
+        - offers
+      summary: Создание нового объявления
+      description: Создание нового объявления пользователем.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/offer'
+      responses:
+        '201':
+          description: Объявление успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        '400':
+          description: Некорректные данные для создания объявления
+
+  /offers/{offerId}:
+    get:
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/id'
+      tags:
+        - offers
+      summary: Получение информации об объявлении
+      description: Получение подробной информации об объявлении по его идентификатору.
+      responses:
+        '200':
+          description: Информация об объявлении успешно получена
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        '404':
+          description: Объявление с указанным идентификатором не найдено
+    patch:
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/id'
+      tags:
+        - offers
+      summary: Обновление объявления
+      description: Обновление информации об объявлении по его идентификатору.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/offer'
+      responses:
+        '200':
+          description: Объявление успешно обновлено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/offer'
+        '400':
+          description: Некорректные данные для обновления объявления
+        '401':
+          description: Пользователь не авторизован
+        '404':
+          description: Объявление с указанным идентификатором не найдено
+    delete:
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/id'
+      tags:
+        - offers
+      summary: Удаление объявления
+      description: Удаление объявления(и всех комментариев к нему) по его идентификатору.
+      security:
+        - bearerAuth: []
+      responses:
+        '204':
+          description: Объявление успешно удалено
+        '401':
+          description: Пользователь не авторизован
+        '404':
+          description: Объявление с указанным идентификатором не найдено
+
+  /offers/premium:
+    get:
+      tags:
+        - offers
+      summary: Получение списка премиальных объявлений
+      description: Получение списка всех премиальных объявлений.
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+            enum: [Paris, Cologne, Brussels, Amsterdam, Hamburg, Dusseldorf]
+      responses:
+        '200':
+          description: Список премиальных объявлений успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 3
+                items:
+                  $ref: '#/components/schemas/offer'
+
+  /offers/{offerId}/favorite:
+    post:
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/id'
+      tags:
+        - offers
+      summary: Добавление объявления в избранное
+      description: Добавление объявления в список избранных пользователя.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Объявление успешно добавлено в избранное
+        '401':
+          description: Пользователь не авторизован
+        '404':
+          description: Объявление с указанным идентификатором не найдено
+    delete:
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/id'
+      tags:
+        - offers
+      summary: Удаление объявления из избранного
+      description: Удаление объявления из списка избранных пользователя.
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Объявление успешно удалено из избранного
+        '401':
+          description: Пользователь не авторизован
+        '404':
+          description: Объявление с указанным идентификатором не найдено
+
+  /offers/{offerId}/comments:
+    get:
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/id'
+      tags:
+        - comments
+      summary: Получение комментариев к объявлению
+      description: Получение списка всех комментариев, связанных с объявлением.
+      responses:
+        '200':
+          description: Список комментариев успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 50
+                items:
+                  $ref: '#/components/schemas/comment'
+        '404':
+          description: Объявление с указанным идентификатором не найдено
+    post:
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/id'
+      tags:
+        - comments
+      summary: Добавление комментария к объявлению
+      description: Добавление нового комментария к объявлению пользователем.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/comment'
+      responses:
+        '201':
+          description: Комментарий успешно добавлен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/comment'
+        '400':
+          description: Некорректные данные для создания комментария
+        '401':
+          description: Пользователь не авторизован
+        '404':
+          description: Объявление с указанным идентификатором не найдено
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    token:
+      type: object
+      properties:
+        token:
+          type: string
+          maxLength: 1024
+          example: 'eyJhbGciOi'
+          description: JWT токен
+
+    id:
+      type: string
+      format: uuid
+      maxLength: 36
+      example: '123e4567-e89b-12d3-a456-426614174000'
+
+    user:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          maxLength: 36
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: 'user@example.com'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 15
+          example: 'Иван Иванов'
+        avatarUrl:
+          type: string
+          format: uri
+          maxLength: 500
+          example: 'https://example.com/avatar.jpg'
+        password:
+          type: string
+          minLength: 6
+          maxLength: 12
+          example: 'password123'
+        type:
+          type: string
+          enum: [Standard, Pro]
+          example: 'Standard'
+      required:
+        - id
+        - email
+        - name
+        - password
+        - type
+
+    offer:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 10
+          maxLength: 100
+          example: 'Уютный особняк на острове Эпштейна'
+        description:
+          type: string
+          minLength: 20
+          maxLength: 1024
+          example: 'Чудесный особняк для отдыха всей семьей'
+        date:
+          type: string
+          maxLength: 30
+          example: '2024-01-20'
+        city:
+          type: string
+          enum: [Paris, Cologne, Brussels, Amsterdam, Hamburg, Dusseldorf]
+          example: 'Paris'
+        previewImage:
+          type: string
+          format: uri
+          maxLength: 500
+          example: 'https://example.com/preview.jpg'
+        photos:
+          type: array
+          minItems: 6
+          maxItems: 6
+          items:
+            type: string
+            format: uri
+            maxLength: 500
+        isPremium:
+          type: boolean
+          example: true
+        isFavorite:
+          type: boolean
+          example: false
+        rating:
+          type: number
+          format: float
+          minimum: 1
+          maximum: 5
+          example: 4.5
+        type:
+          type: string
+          enum: [apartment, house, room, hotel]
+          example: 'house'
+        rooms:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 8
+          example: 3
+        guests:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 10
+          example: 5
+        price:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 100000
+          example: 10000
+        features:
+          type: array
+          maxItems: 20
+          items:
+            type: string
+            enum:
+              [
+                Breakfast,
+                Air conditioning,
+                Laptop friendly workspace,
+                Baby seat,
+                Washer,
+                Towels,
+                Fridge,
+              ]
+        userId:
+          type: string
+          format: uuid
+          maxLength: 36
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        commentCount:
+          type: integer
+          format: int32
+          example: 5
+        location:
+          type: object
+          properties:
+            latitude:
+              type: number
+              format: float
+              example: 48.85661
+            longitude:
+              type: number
+              format: float
+              example: 2.351499
+
+    comment:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          maxLength: 36
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        text:
+          type: string
+          minLength: 5
+          maxLength: 1024
+          example: 'Отличное предложение! Очень понравилось.'
+        date:
+          type: string
+          maxLength: 30
+          example: '2024-01-21T14:30:00Z'
+        rating:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 5
+          example: 5
+        userId:
+          type: string
+          format: uuid
+          maxLength: 36
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        offerId:
+          type: string
+          format: uuid
+          maxLength: 36
+          example: '123e4567-e89b-12d3-a456-426614174000'
+
+    createUser:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          maxLength: 36
+          example: '123e4567-e89b-12d3-a456-426614174000'
+        email:
+          type: string
+          format: email
+          maxLength: 255
+          example: 'user@example.com'
+        avatarUrl:
+          type: string
+          format: uri
+          maxLength: 500
+          example: 'https://example.com/avatar.jpg'
+        type:
+          type: string
+          enum: [Standard, Pro]
+          example: 'Standard'
