@@ -1,4 +1,9 @@
-import { defaultClasses, modelOptions, prop } from '@typegoose/typegoose';
+import {
+  defaultClasses,
+  getModelForClass,
+  modelOptions,
+  prop,
+} from '@typegoose/typegoose';
 import { CommentType } from '../../types/index.js';
 
 export interface CommentEntity extends defaultClasses.Base {}
@@ -40,3 +45,5 @@ export class CommentEntity
   @prop({ required: true, type: () => String })
   authorId: string;
 }
+
+export const CommentModel = getModelForClass(CommentEntity);
