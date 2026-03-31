@@ -1,8 +1,8 @@
 import { createReadStream } from 'node:fs';
 import { IFileReader } from './file-reader.interface.js';
-import { Offer } from '../../types/index.js';
 import { createOffer } from '../../helpers/index.js';
 import { EventEmitter } from 'node:events';
+import { ParsedLine } from '../../types/parsed-line.type.js';
 
 const CHUNK_SIZE = 16384;
 export class TsvFileReader extends EventEmitter implements IFileReader {
@@ -38,7 +38,7 @@ export class TsvFileReader extends EventEmitter implements IFileReader {
     }
   }
 
-  public toArray(): Offer[] {
+  public toArray(): ParsedLine[] {
     if (!this.rawData) {
       throw new Error('No data to parse. Please call read() method first.');
     }
