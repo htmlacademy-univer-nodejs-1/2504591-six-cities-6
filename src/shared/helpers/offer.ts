@@ -1,16 +1,12 @@
 import {
-  Offer,
   OfferCityType,
   OfferFeatureType,
   OfferType,
-  UserType,
-  UserTypeEnum,
-} from '../types/index.js';
-import {
   OfferTypeEmum,
   OfferCityEnum,
   OfferFeatureEnum,
-} from '../types/offer.type.js';
+} from '../types/index.js';
+import { ParsedLine } from '../types/parsed-line.type.js';
 import { includes } from './common.js';
 
 const isCoordinatesValid = (
@@ -32,9 +28,7 @@ const isOfferCityType = (city: string): city is OfferCityType =>
 const isOfferFeatureType = (feature: string): feature is OfferFeatureType =>
   includes(Object.values(OfferFeatureEnum), feature);
 
-const isUserType = (type: string): type is UserType =>
-  includes(Object.values(UserTypeEnum), type);
-export const createOffer = (line: string): Offer => {
+export const createOffer = (line: string): ParsedLine => {
   const [
     name,
     description,
@@ -50,45 +44,57 @@ export const createOffer = (line: string): Offer => {
     guests,
     price,
     features,
-    user,
+    userInfo,
     coordinates,
   ] = line.split('\t');
-  const [username, email, avatar, password, userType] = user.split(';');
+
+  const [userName, userEmail, userAvatar, userPassword, userType] =
+    userInfo.split(';');
+
   const coord = coordinates.split(';').map(Number);
   const featuresArray = features.split(';');
 
-  if (
-    !isCoordinatesValid(coord) ||
-    !isOfferType(type) ||
-    !isOfferCityType(city) ||
-    !featuresArray.every(isOfferFeatureType) ||
-    !isUserType(userType)
-  ) {
-    throw new Error(`Invalid offer data: ${line}`);
+  if (!isCoordinatesValid(coord)) {
+    throw new Error(`Invalid coordinates: ${coordinates}`);
+  }
+
+  if (!isOfferType(type)) {
+    throw new Error(`Invalid offer type: ${type}`);
+  }
+
+  if (!isOfferCityType(city)) {
+    throw new Error(`Invalid city: ${city}`);
+  }
+
+  if (!featuresArray.every(isOfferFeatureType)) {
+    const invalid = featuresArray.filter((f) => !isOfferFeatureType(f));
+    throw new Error(`Invalid features: ${invalid.join(', ')}`);
   }
 
   return {
-    name,
-    description,
-    date: new Date(date),
-    city,
-    preview,
-    images: images.split(';'),
-    isPremium: isPremium === 'true',
-    isFavorite: isFavorite === 'true',
-    rating: parseFloat(rating),
-    type,
-    rooms: parseInt(rooms, 10),
-    guests: parseInt(guests, 10),
-    price: parseInt(price, 10),
-    features: featuresArray,
+    offer: {
+      name,
+      description,
+      date: new Date(date),
+      city,
+      preview,
+      images: images.split(';'),
+      isPremium: isPremium === 'true',
+      isFavorite: isFavorite === 'true',
+      rating: Number(rating),
+      type,
+      rooms: Number(rooms),
+      guests: Number(guests),
+      price: Number(price),
+      features: featuresArray,
+      coordinates: coord,
+    },
     user: {
-      name: username,
-      email,
-      avatar,
-      password,
+      name: userName,
+      email: userEmail,
+      avatar: userAvatar,
+      password: userPassword,
       type: userType,
     },
-    coordinates: coord,
   };
 };
