@@ -20,6 +20,7 @@ import {
 } from '../../shared/modules/user/index.js';
 import { IUserService } from '../../shared/modules/user/user-service.interface.js';
 import { ParsedLine } from '../../shared/types/parsed-line.type.js';
+import { CommentModel } from '../../shared/modules/comment/comment.entity.js';
 
 export class ImportCommand implements ICommand {
   private offerService: IOfferService;
@@ -30,7 +31,12 @@ export class ImportCommand implements ICommand {
 
   constructor() {
     this.logger = new ConsoleLogger();
-    this.offerService = new DefaultOfferService(this.logger, OfferModel);
+    this.offerService = new DefaultOfferService(
+      this.logger,
+      OfferModel,
+      CommentModel,
+      UserModel
+    );
     this.databaseClient = new MongoDatabaseClient(this.logger);
     this.userService = new DefaultUserService(this.logger, UserModel);
     this.salt = process.env.SALT ?? 'default-salt';
