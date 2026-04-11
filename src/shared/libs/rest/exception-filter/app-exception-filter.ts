@@ -4,6 +4,8 @@ import { Component } from '../../../types/component.enum.js';
 import { ILogger } from '../../logger/logger.interface.js';
 import { NextFunction, Response, Request } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { HttpError } from '../errors/http-error.js';
+import { createErrorObject } from '../../../helpers/common.js';
 
 @injectable()
 export class AppExpectionFilter implements IExceptionFilter {
@@ -12,6 +14,32 @@ export class AppExpectionFilter implements IExceptionFilter {
   }
 
   public catch(
+    error: Error,
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void {
+    if (error instanceof HttpError) {
+      return this.handleHttpError(error, req, res, next);
+    }
+
+    this.handleOtherError(error, req, res, next);
+  }
+
+  private handleHttpError(
+    error: HttpError,
+    _req: Request,
+    res: Response,
+    _next: NextFunction
+  ) {
+    this.logger.error(
+      `[${error.detail}]: ${error.httpStatusCode} — ${error.message}`,
+      error
+    );
+    res.status(error.httpStatusCode).json(createErrorObject(error.message));
+  }
+
+  private handleOtherError(
     error: Error,
     _req: Request,
     res: Response,

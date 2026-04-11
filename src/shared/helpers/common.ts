@@ -28,3 +28,7 @@ export const getErrorMessage = (error: unknown): string =>
 
 export const fillDTO = <T, V>(someDTO: ClassConstructor<T>, plainObject: V) =>
   plainToInstance(someDTO, plainObject, { excludeExtraneousValues: true });
+
+export const createErrorObject = (message: string) => ({
+  error: message,
+});

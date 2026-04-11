@@ -1,7 +1,13 @@
 import { injectable } from 'inversify';
 import { IController } from './controller.interface';
 import { ILogger } from '../../logger';
-import { Response, Router } from 'express';
+import {
+  NextFunction,
+  RequestHandler,
+  Request,
+  Response,
+  Router,
+} from 'express';
 import { Route } from '../types/route.interface';
 import { StatusCodes } from 'http-status-codes';
 
@@ -19,7 +25,9 @@ export abstract class BaseController implements IController {
   }
 
   addRoute(route: Route): void {
-    this._router[route.method](route.path, route.handler.bind(this));
+    const handler = route.handler.bind(this);
+    const wrapperAsyncHandler = this.asyncHandler(handler);
+    this._router[route.method](route.path, wrapperAsyncHandler);
     this.logger.info(
       `Route registered: ${route.method.toUpperCase()} ${route.path}`
     );
@@ -39,5 +47,17 @@ export abstract class BaseController implements IController {
 
   noContent<T>(res: Response, data: T): void {
     this.send(res, StatusCodes.NO_CONTENT, data);
+  }
+
+  private asyncHandler(fn: RequestHandler): RequestHandler {
+    return (req: Request, res: Response, next: NextFunction) => {
+      const result = fn(req, res, next);
+
+      if (result instanceof Promise) {
+        result.catch(next);
+      }
+
+      return result;
+    };
   }
 }

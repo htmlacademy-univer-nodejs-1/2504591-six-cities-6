@@ -1,5 +1,11 @@
 import { inject, injectable } from 'inversify';
-import { BaseController, HttpMethod } from '../../libs/rest/index.js';
+import {
+  BaseController,
+  HttpError,
+  HttpMethod,
+  RequestBody,
+  RequestParams,
+} from '../../libs/rest/index.js';
 import { Component } from '../../types/component.enum.js';
 import { ILogger } from '../../libs/logger/logger.interface.js';
 import { Response, Request } from 'express';
@@ -29,26 +35,17 @@ export class OfferController extends BaseController {
   }
 
   public async create(
-    {
-      body,
-    }: Request<
-      Record<string, unknown>,
-      Record<string, unknown>,
-      CreateOfferDto
-    >,
+    { body }: Request<RequestParams, RequestBody, CreateOfferDto>,
     res: Response
   ): Promise<void> {
     const existOffer = await this.offerService.findByOfferName(body.name);
 
     if (existOffer) {
-      const existOfferError = new Error(
-        `Offer with name «${body.name}» exists.`
+      throw new HttpError(
+        StatusCodes.UNPROCESSABLE_ENTITY,
+        `Offer with name «${body.name}» exists.`,
+        'OfferController'
       );
-      this.send(res, StatusCodes.UNPROCESSABLE_ENTITY, {
-        error: existOfferError.message,
-      });
-
-      return this.logger.error(existOfferError.message, existOfferError);
     }
 
     const result = await this.offerService.create(body);
