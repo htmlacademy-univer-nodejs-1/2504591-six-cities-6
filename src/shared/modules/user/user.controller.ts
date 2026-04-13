@@ -6,14 +6,17 @@ import {
 } from '../../libs/rest/index.js';
 import { Component } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
-import { CreateUserRequest } from './create-user-request.type.js';
+import { CreateUserRequest } from './requests/create-user-request.type.js';
 import { Response } from 'express';
 import { IUserService } from './user-service.interface.js';
 import { IConfig, RestSchema } from '../../libs/config/index.js';
 import { StatusCodes } from 'http-status-codes';
 import { fillDTO } from '../../helpers/index.js';
 import { UserRdo } from './rdo/user.rdo.js';
-import { LoginUserRequest } from './login-user-request.type.js';
+import { LoginUserRequest } from './requests/login-user-request.type.js';
+import { LogoutUserRequest } from './requests/logout-user-request.type.js';
+import { RefreshUserRequest } from './requests/refresh-user-request.type.js';
+import { MeUserRequest } from './requests/me-user-request.type.js';
 
 @injectable()
 export class UserController extends BaseController {
@@ -35,6 +38,24 @@ export class UserController extends BaseController {
       path: '/login',
       method: HttpMethod.Post,
       handler: this.login,
+    });
+
+    this.addRoute({
+      path: '/logout',
+      method: HttpMethod.Post,
+      handler: this.logout,
+    });
+
+    this.addRoute({
+      path: '/refresh',
+      method: HttpMethod.Post,
+      handler: this.refresh,
+    });
+
+    this.addRoute({
+      path: '/me',
+      method: HttpMethod.Get,
+      handler: this.me,
     });
   }
 
@@ -66,6 +87,24 @@ export class UserController extends BaseController {
       );
     }
 
-    this.ok(res, fillDTO(UserRdo, existUser));
+    this.ok(res, { token: String(existUser._id) });
+  }
+
+  public async logout(
+    { body }: LogoutUserRequest,
+    res: Response
+  ): Promise<void> {
+    this.noContent(res, { body });
+  }
+
+  public async refresh(
+    { body }: RefreshUserRequest,
+    res: Response
+  ): Promise<void> {
+    this.ok(res, body.token);
+  }
+
+  public async me({ body }: MeUserRequest, res: Response): Promise<void> {
+    this.ok(res, { body });
   }
 }
