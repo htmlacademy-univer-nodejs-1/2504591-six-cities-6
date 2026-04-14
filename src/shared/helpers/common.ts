@@ -1,3 +1,5 @@
+import { ClassConstructor, plainToInstance } from 'class-transformer';
+
 export const includes = <T>(array: readonly T[], value: unknown): boolean =>
   (array as readonly unknown[]).includes(value);
 
@@ -23,3 +25,10 @@ export const getRandomItem = <T>(array: T[]): T => {
 
 export const getErrorMessage = (error: unknown): string =>
   error instanceof Error ? error.message : String(error);
+
+export const fillDTO = <T, V>(someDTO: ClassConstructor<T>, plainObject: V) =>
+  plainToInstance(someDTO, plainObject, { excludeExtraneousValues: true });
+
+export const createErrorObject = (message: string) => ({
+  error: message,
+});
