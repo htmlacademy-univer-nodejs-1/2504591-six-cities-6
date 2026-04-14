@@ -85,8 +85,8 @@ paths:
         - auth
       summary: Выход пользователя из системы
       description: Выход пользователя из системы и удаление его refresh-токена.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       responses:
         '204':
           description: Пользователь успешно вышел из системы
@@ -99,8 +99,8 @@ paths:
         - auth
       summary: Обновление токена
       description: Получение нового токена доступа с помощью refresh-токена.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -123,8 +123,8 @@ paths:
         - users
       summary: Получение информации о текущем пользователе
       description: Получение информации о текущем аутентифицированном пользователе.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       responses:
         '200':
           description: Информация о пользователе успешно получена
@@ -143,8 +143,8 @@ paths:
         - offers
       summary: Получение списка избранных объявлений
       description: Получение списка всех объявлений, добавленных пользователем в избранное.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       responses:
         '200':
           description: Список избранных объявлений успешно получен
@@ -189,8 +189,8 @@ paths:
         - offers
       summary: Создание нового объявления
       description: Создание нового объявления пользователем.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -239,8 +239,8 @@ paths:
         - offers
       summary: Обновление объявления
       description: Обновление информации об объявлении по его идентификатору.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -271,8 +271,8 @@ paths:
         - offers
       summary: Удаление объявления
       description: Удаление объявления(и всех комментариев к нему) по его идентификатору.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       responses:
         '204':
           description: Объявление успешно удалено
@@ -317,8 +317,8 @@ paths:
         - offers
       summary: Добавление объявления в избранное
       description: Добавление объявления в список избранных пользователя.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       responses:
         '200':
           description: Объявление успешно добавлено в избранное
@@ -337,8 +337,8 @@ paths:
         - offers
       summary: Удаление объявления из избранного
       description: Удаление объявления из списка избранных пользователя.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       responses:
         '200':
           description: Объявление успешно удалено из избранного
@@ -382,8 +382,8 @@ paths:
         - comments
       summary: Добавление комментария к объявлению
       description: Добавление нового комментария к объявлению пользователем.
-      security:
-        - bearerAuth: []
+      # security:
+      #   - bearerAuth: []
       requestBody:
         required: true
         content:

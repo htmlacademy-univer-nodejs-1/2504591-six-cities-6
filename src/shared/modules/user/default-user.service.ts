@@ -27,6 +27,10 @@ export class DefaultUserService implements IUserService {
     return res as Promise<DocumentType<UserEntity>>;
   }
 
+  public findById(id: string): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel.findOne({ id });
+  }
+
   public findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {
     return this.userModel.findOne({ email });
   }

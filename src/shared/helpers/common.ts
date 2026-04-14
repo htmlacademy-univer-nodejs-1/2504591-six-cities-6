@@ -1,4 +1,6 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
+import { HttpError, RequestParams } from '../libs/rest/index.js';
+import { StatusCodes } from 'http-status-codes';
 
 export const includes = <T>(array: readonly T[], value: unknown): boolean =>
   (array as readonly unknown[]).includes(value);
@@ -32,3 +34,14 @@ export const fillDTO = <T, V>(someDTO: ClassConstructor<T>, plainObject: V) =>
 export const createErrorObject = (message: string) => ({
   error: message,
 });
+
+export const getId = (params: RequestParams): string => {
+  const { offerId } = params;
+  if (typeof offerId !== 'string') {
+    throw new HttpError(
+      StatusCodes.BAD_REQUEST,
+      `Id «${offerId}» not correct.`
+    );
+  }
+  return offerId;
+};
