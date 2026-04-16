@@ -8,13 +8,13 @@ export const OfferCityEnum = {
 } as const;
 export type OfferCityType = (typeof OfferCityEnum)[keyof typeof OfferCityEnum];
 
-export const OfferTypeEmum = {
+export const OfferTypeEnum = {
   Apartment: 'Apartment',
   House: 'House',
   Room: 'Room',
   Hotel: 'Hotel',
 } as const;
-export type OfferType = (typeof OfferTypeEmum)[keyof typeof OfferTypeEmum];
+export type OfferType = (typeof OfferTypeEnum)[keyof typeof OfferTypeEnum];
 
 export const OfferFeatureEnum = {
   Breakfast: 'Breakfast',

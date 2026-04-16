@@ -4,6 +4,8 @@ import {
   HttpMethod,
   RequestBody,
   RequestParams,
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware,
 } from '../../libs/rest/index.js';
 import { Component } from '../../types/component.enum.js';
 import { ILogger } from '../../libs/logger/logger.interface.js';
@@ -26,12 +28,17 @@ export class CommentController extends BaseController {
       path: '/:offerId/comments',
       method: HttpMethod.Get,
       handler: this.index,
+      middlewares: [new ValidateObjectIdMiddleware('offerId')],
     });
 
     this.addRoute({
       path: '/:offerId/comments',
       method: HttpMethod.Post,
       handler: this.create,
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new ValidateDtoMiddleware(CreateCommentDto),
+      ],
     });
   }
 
