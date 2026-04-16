@@ -42,4 +42,7 @@ export class OfferRdo {
 
   @Expose()
   public coordinates: number[];
+
+  @Expose()
+  public commentsCount: number;
 }

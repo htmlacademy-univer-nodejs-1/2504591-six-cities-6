@@ -44,6 +44,9 @@ export class CommentEntity
 
   @prop({ required: true, type: () => String })
   authorId: string;
+
+  @prop({ required: true, type: () => String })
+  offerId: string;
 }
 
 export const CommentModel = getModelForClass(CommentEntity);

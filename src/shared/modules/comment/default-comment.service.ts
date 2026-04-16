@@ -6,6 +6,8 @@ import { CommentEntity } from './comment.entity.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
 import { DocumentType, types } from '@typegoose/typegoose';
 
+const DEFAULT_COMMENT_LIMIT = 50;
+
 export class DefaultCommentService implements ICommentService {
   constructor(
     @inject(Component.Logger) private readonly logger: ILogger,
@@ -19,9 +21,15 @@ export class DefaultCommentService implements ICommentService {
     return result;
   }
 
-  findByCommentId(
-    commentId: string
-  ): Promise<DocumentType<CommentEntity> | null> {
-    return this.commentModel.findById(commentId).exec();
+  async find(offerId: string): Promise<DocumentType<CommentEntity>[]> {
+    this.logger.info(`Finding comments for offer ${offerId}...`);
+    const comments = await this.commentModel
+      .find({ offerId })
+      .sort({ createdAt: -1 })
+      .limit(DEFAULT_COMMENT_LIMIT)
+      .exec();
+
+    this.logger.info(`Find comments: ${comments.join()}`);
+    return comments;
   }
 }
