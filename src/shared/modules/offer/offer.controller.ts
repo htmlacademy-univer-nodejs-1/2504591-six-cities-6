@@ -3,13 +3,14 @@ import {
   BaseController,
   HttpError,
   HttpMethod,
-  RequestParams,
+  ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware,
 } from '../../libs/rest/index.js';
 import { Component } from '../../types/component.enum.js';
 import { ILogger } from '../../libs/logger/logger.interface.js';
 import { Response, Request } from 'express';
-import { IOfferService } from './index.js';
-import { fillDTO } from '../../helpers/common.js';
+import { CreateOfferDto, IOfferService, UpdateOfferDto } from './index.js';
+import { fillDTO, getId } from '../../helpers/common.js';
 import { OfferRdo } from './rdo/offer.rdo.js';
 import { StatusCodes } from 'http-status-codes';
 import { CreateOfferRequest } from './requests/create-offer-request.type.js';
@@ -19,7 +20,8 @@ import { PatchOfferRequest } from './requests/patch-offer-request.type.js';
 export class OfferController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: ILogger,
-    @inject(Component.OfferService) private readonly offerService: IOfferService
+    @inject(Component.OfferService)
+    private readonly offerService: IOfferService
   ) {
     super(logger);
 
@@ -27,24 +29,53 @@ export class OfferController extends BaseController {
 
     this.addRoute({ path: '/', method: HttpMethod.Get, handler: this.index });
 
-    this.addRoute({ path: '/', method: HttpMethod.Post, handler: this.create });
+    this.addRoute({
+      path: '/',
+      method: HttpMethod.Post,
+      handler: this.create,
+      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)],
+    });
 
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Get,
-      handler: this.get,
+      handler: this.show,
+      middlewares: [new ValidateObjectIdMiddleware('offerId')],
     });
 
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Patch,
       handler: this.patch,
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new ValidateDtoMiddleware(UpdateOfferDto),
+      ],
     });
 
     this.addRoute({
       path: '/:offerId',
       method: HttpMethod.Delete,
       handler: this.delete,
+      middlewares: [new ValidateObjectIdMiddleware('offerId')],
+    });
+
+    this.addRoute({
+      path: '/:offerId/favorite',
+      method: HttpMethod.Post,
+      handler: this.postFavorite,
+    });
+
+    this.addRoute({
+      path: '/:offerId/favorite',
+      method: HttpMethod.Delete,
+      handler: this.deleteFavorite,
+    });
+
+    this.addRoute({
+      path: '/premium',
+      method: HttpMethod.Get,
+      handler: this.getPremium,
     });
   }
 
@@ -72,10 +103,10 @@ export class OfferController extends BaseController {
     this.created(res, fillDTO(OfferRdo, result));
   }
 
-  public async get(req: Request, res: Response): Promise<void> {
+  public async show(req: Request, res: Response): Promise<void> {
     this.logger.info('req.params:', req.params);
     this.logger.info('req.url:', req.url);
-    const id = this.getId(req.params);
+    const id = getId(req.params);
     const existOffer = await this.offerService.findByOfferId(id);
     if (!existOffer) {
       throw new HttpError(
@@ -90,7 +121,7 @@ export class OfferController extends BaseController {
   }
 
   public async patch(req: PatchOfferRequest, res: Response): Promise<void> {
-    const id = this.getId(req.params);
+    const id = getId(req.params);
 
     const existOffer = await this.offerService.findByOfferId(id);
     if (!existOffer) {
@@ -102,11 +133,13 @@ export class OfferController extends BaseController {
     }
 
     const result = await this.offerService.updateById(id, req.body);
-    this.ok(res, result);
+    const responseData = fillDTO(OfferRdo, result);
+
+    this.ok(res, responseData);
   }
 
   public async delete(req: PatchOfferRequest, res: Response): Promise<void> {
-    const id = this.getId(req.params);
+    const id = getId(req.params);
     const existOffer = await this.offerService.findByOfferId(id);
     if (!existOffer) {
       throw new HttpError(
@@ -119,11 +152,19 @@ export class OfferController extends BaseController {
     this.ok(res, result);
   }
 
-  private getId(params: RequestParams): string {
-    const { offerId } = params;
-    if (typeof offerId !== 'string') {
-      throw new Error();
-    }
-    return offerId;
+  public async getPremium(_req: Request, res: Response): Promise<void> {
+    const offers = await this.offerService.findPremium();
+    const responseData = fillDTO(OfferRdo, offers);
+    this.ok(res, responseData);
+  }
+
+  public async postFavorite(req: Request, res: Response): Promise<void> {
+    //нет идей как реализовать
+    this.ok(res, req);
+  }
+
+  public async deleteFavorite(req: Request, res: Response): Promise<void> {
+    //нет идей как реализовать
+    this.ok(res, req);
   }
 }

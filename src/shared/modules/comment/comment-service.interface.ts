@@ -4,7 +4,5 @@ import { CreateCommentDto } from './dto/create-comment.dto.js';
 
 export interface ICommentService {
   create(dto: CreateCommentDto): Promise<DocumentType<CommentEntity>>;
-  findByCommentId(
-    commentId: string
-  ): Promise<DocumentType<CommentEntity> | null>;
+  find(offerId: string): Promise<DocumentType<CommentEntity>[]>;
 }

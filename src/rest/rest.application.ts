@@ -21,6 +21,8 @@ export class RestApplication {
     private readonly offerControler: IController,
     @inject(Component.UserController)
     private readonly userController: IController,
+    @inject(Component.CommentController)
+    private readonly commentController: IController,
     @inject(Component.ExceptionFilter)
     private readonly appExceptionFilter: IExceptionFilter
   ) {
@@ -74,6 +76,7 @@ export class RestApplication {
 
   private async _intiControllers() {
     this.server.use('/offers', this.offerControler.router);
+    this.server.use('/offers', this.commentController.router);
     this.server.use('/users', this.userController.router);
   }
 

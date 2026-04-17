@@ -13,6 +13,7 @@ export interface IOfferService {
     dto: CreateOfferDto
   ): Promise<DocumentType<OfferEntity>>;
   find(): Promise<DocumentType<OfferEntity>[]>;
+  findPremium(): Promise<DocumentType<OfferEntity>[]>;
   deleteById(offerId: string): Promise<DeleteResult>;
   updateById(
     offerId: string,

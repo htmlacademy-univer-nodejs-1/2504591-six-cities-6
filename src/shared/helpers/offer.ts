@@ -2,7 +2,7 @@ import {
   OfferCityType,
   OfferFeatureType,
   OfferType,
-  OfferTypeEmum,
+  OfferTypeEnum,
   OfferCityEnum,
   OfferFeatureEnum,
 } from '../types/index.js';
@@ -20,7 +20,7 @@ const isCoordinatesValid = (
   !isNaN(coordinates[1]);
 
 const isOfferType = (type: string): type is OfferType =>
-  includes(Object.values(OfferTypeEmum), type);
+  includes(Object.values(OfferTypeEnum), type);
 
 const isOfferCityType = (city: string): city is OfferCityType =>
   includes(Object.values(OfferCityEnum), city);

@@ -11,7 +11,7 @@ import {
   OfferFeatureEnum,
   OfferFeatureType,
   OfferType,
-  OfferTypeEmum,
+  OfferTypeEnum,
 } from '../../types/index.js';
 
 export interface OfferEntity extends defaultClasses.Base {}
@@ -61,7 +61,7 @@ export class OfferEntity extends defaultClasses.TimeStamps implements Offer {
   @prop({ required: true, default: 1, type: () => Number })
   rating: number;
 
-  @prop({ required: true, type: () => String, enum: OfferTypeEmum })
+  @prop({ required: true, type: () => String, enum: OfferTypeEnum })
   type: OfferType;
 
   @prop({ required: true, default: 1, type: () => Number })
