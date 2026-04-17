@@ -64,6 +64,14 @@ export class DefaultOfferService implements IOfferService {
       .exec();
   }
 
+  public async findPremium(): Promise<DocumentType<OfferEntity>[]> {
+    return this.offerModel
+      .find({ isPremium: true })
+      .sort({ createdAt: SortType.Down })
+      .limit(DEFAULT_OFFER_COUNT)
+      .exec();
+  }
+
   public async deleteById(offerId: string): Promise<DeleteResult> {
     return this.offerModel.deleteOne({ _id: offerId }).exec();
   }

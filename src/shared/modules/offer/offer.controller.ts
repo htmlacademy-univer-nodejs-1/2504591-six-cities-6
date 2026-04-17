@@ -59,6 +59,24 @@ export class OfferController extends BaseController {
       handler: this.delete,
       middlewares: [new ValidateObjectIdMiddleware('offerId')],
     });
+
+    this.addRoute({
+      path: '/:offerId/favorite',
+      method: HttpMethod.Post,
+      handler: this.postFavorite,
+    });
+
+    this.addRoute({
+      path: '/:offerId/favorite',
+      method: HttpMethod.Delete,
+      handler: this.deleteFavorite,
+    });
+
+    this.addRoute({
+      path: '/premium',
+      method: HttpMethod.Get,
+      handler: this.getPremium,
+    });
   }
 
   public async index(_req: Request, res: Response): Promise<void> {
@@ -132,5 +150,21 @@ export class OfferController extends BaseController {
     }
     const result = await this.offerService.deleteById(id);
     this.ok(res, result);
+  }
+
+  public async getPremium(_req: Request, res: Response): Promise<void> {
+    const offers = await this.offerService.findPremium();
+    const responseData = fillDTO(OfferRdo, offers);
+    this.ok(res, responseData);
+  }
+
+  public async postFavorite(req: Request, res: Response): Promise<void> {
+    //нет идей как реализовать
+    this.ok(res, req);
+  }
+
+  public async deleteFavorite(req: Request, res: Response): Promise<void> {
+    //нет идей как реализовать
+    this.ok(res, req);
   }
 }
