@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import {
   BaseController,
+  DocumentExistsMiddleware,
   HttpMethod,
   RequestBody,
   RequestParams,
@@ -14,13 +15,16 @@ import { Request, Response } from 'express';
 import { fillDTO, getId } from '../../helpers/common.js';
 import { CommentRdo } from './rdo/comment.rdo.js';
 import { CreateCommentDto } from './dto/create-comment.dto.js';
+import { IOfferService } from '../offer/offer-service.interface.js';
 
 @injectable()
 export class CommentController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: ILogger,
     @inject(Component.CommentService)
-    private readonly commentService: ICommentService
+    private readonly commentService: ICommentService,
+    @inject(Component.OfferService)
+    protected readonly offerService: IOfferService
   ) {
     super(logger);
 
@@ -28,7 +32,10 @@ export class CommentController extends BaseController {
       path: '/:offerId/comments',
       method: HttpMethod.Get,
       handler: this.index,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')],
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
+      ],
     });
 
     this.addRoute({
@@ -38,6 +45,7 @@ export class CommentController extends BaseController {
       middlewares: [
         new ValidateObjectIdMiddleware('offerId'),
         new ValidateDtoMiddleware(CreateCommentDto),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
       ],
     });
   }

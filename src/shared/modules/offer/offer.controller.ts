@@ -1,6 +1,7 @@
 import { inject, injectable } from 'inversify';
 import {
   BaseController,
+  DocumentExistsMiddleware,
   HttpError,
   HttpMethod,
   ValidateDtoMiddleware,
@@ -40,7 +41,10 @@ export class OfferController extends BaseController {
       path: '/:offerId',
       method: HttpMethod.Get,
       handler: this.show,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')],
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
+      ],
     });
 
     this.addRoute({
@@ -50,6 +54,7 @@ export class OfferController extends BaseController {
       middlewares: [
         new ValidateObjectIdMiddleware('offerId'),
         new ValidateDtoMiddleware(UpdateOfferDto),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
       ],
     });
 
@@ -57,7 +62,10 @@ export class OfferController extends BaseController {
       path: '/:offerId',
       method: HttpMethod.Delete,
       handler: this.delete,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')],
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
+      ],
     });
 
     this.addRoute({
@@ -107,14 +115,7 @@ export class OfferController extends BaseController {
     this.logger.info('req.params:', req.params);
     this.logger.info('req.url:', req.url);
     const id = getId(req.params);
-    const existOffer = await this.offerService.findByOfferId(id);
-    if (!existOffer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id «${id}» not found.`,
-        'OfferController'
-      );
-    }
+
     const offer = await this.offerService.findByOfferId(id);
     const responseData = fillDTO(OfferRdo, offer);
     this.ok(res, responseData);
@@ -122,15 +123,6 @@ export class OfferController extends BaseController {
 
   public async patch(req: PatchOfferRequest, res: Response): Promise<void> {
     const id = getId(req.params);
-
-    const existOffer = await this.offerService.findByOfferId(id);
-    if (!existOffer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id «${id}» not found.`,
-        'OfferController'
-      );
-    }
 
     const result = await this.offerService.updateById(id, req.body);
     const responseData = fillDTO(OfferRdo, result);
@@ -140,14 +132,7 @@ export class OfferController extends BaseController {
 
   public async delete(req: PatchOfferRequest, res: Response): Promise<void> {
     const id = getId(req.params);
-    const existOffer = await this.offerService.findByOfferId(id);
-    if (!existOffer) {
-      throw new HttpError(
-        StatusCodes.NOT_FOUND,
-        `Offer with id «${id}» not found.`,
-        'OfferController'
-      );
-    }
+
     const result = await this.offerService.deleteById(id);
     this.ok(res, result);
   }
