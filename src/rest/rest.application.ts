@@ -1,6 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { IConfig } from '../shared/libs/config/index.js';
-import { RestSchema } from '../shared/libs/config/rest.shema.js';
+import { RestSchema } from '../shared/libs/config/rest.schema.js';
 import { ILogger } from '../shared/libs/logger/index.js';
 import { Component } from '../shared/types/component.enum.js';
 import { IDatabaseClient } from '../shared/libs/database-client/index.js';
