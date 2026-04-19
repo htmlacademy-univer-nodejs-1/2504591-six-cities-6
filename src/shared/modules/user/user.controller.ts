@@ -3,12 +3,14 @@ import {
   BaseController,
   HttpError,
   HttpMethod,
+  UploadFileMiddleware,
   ValidateDtoMiddleware,
+  ValidateObjectIdMiddleware,
 } from '../../libs/rest/index.js';
 import { Component } from '../../types/index.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { CreateUserRequest } from './requests/create-user-request.type.js';
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { IUserService } from './user-service.interface.js';
 import { IConfig, RestSchema } from '../../libs/config/index.js';
 import { StatusCodes } from 'http-status-codes';
@@ -62,6 +64,16 @@ export class UserController extends BaseController {
       method: HttpMethod.Get,
       handler: this.me,
     });
+
+    this.addRoute({
+      path: '/:userId/avatar',
+      method: HttpMethod.Post,
+      handler: this.uploadAvatar,
+      middlewares: [
+        new ValidateObjectIdMiddleware('userId'),
+        new UploadFileMiddleware(this.config.get('UPLOAD_DIRECTORY'), 'avatar'),
+      ],
+    });
   }
 
   public async create(
@@ -111,5 +123,9 @@ export class UserController extends BaseController {
 
   public async me({ body }: MeUserRequest, res: Response): Promise<void> {
     this.ok(res, { body });
+  }
+
+  public async uploadAvatar(req: Request, res: Response): Promise<void> {
+    this.created(res, { filepath: req.file?.path });
   }
 }
