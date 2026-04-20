@@ -38,4 +38,10 @@ Content-Type: image/png
 < /Users/spider_net/Desktop/screen.png
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
-##
+###
+
+## Проверить токен пользователя
+GET http://localhost:4000/users/login HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmVmcmV5IEVwc3RpbmUiLCJpZCI6IjY5ZGE2MTE0ODM5YjkwZTc3NGI4ZDZmMCIsImlhdCI6MTc3NjY4NDczOCwiZXhwIjoxNzc2ODU3NTM4fQ.xEULaohPTAYJFCQHl3xwAcS3u2rr4CSUf9kWlGfRv3g
+
+###

@@ -4,6 +4,7 @@ import {
   DocumentExistsMiddleware,
   HttpError,
   HttpMethod,
+  PrivateRouteMiddleware,
   ValidateDtoMiddleware,
   ValidateObjectIdMiddleware,
 } from '../../libs/rest/index.js';
@@ -34,7 +35,10 @@ export class OfferController extends BaseController {
       path: '/',
       method: HttpMethod.Post,
       handler: this.create,
-      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)],
+      middlewares: [
+        new PrivateRouteMiddleware(),
+        new ValidateDtoMiddleware(CreateOfferDto),
+      ],
     });
 
     this.addRoute({
@@ -52,6 +56,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Patch,
       handler: this.patch,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new ValidateDtoMiddleware(UpdateOfferDto),
         new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
@@ -63,6 +68,7 @@ export class OfferController extends BaseController {
       method: HttpMethod.Delete,
       handler: this.delete,
       middlewares: [
+        new PrivateRouteMiddleware(),
         new ValidateObjectIdMiddleware('offerId'),
         new DocumentExistsMiddleware(offerService, 'Offer', 'offerId'),
       ],
@@ -72,12 +78,14 @@ export class OfferController extends BaseController {
       path: '/:offerId/favorite',
       method: HttpMethod.Post,
       handler: this.postFavorite,
+      middlewares: [new PrivateRouteMiddleware()],
     });
 
     this.addRoute({
       path: '/:offerId/favorite',
       method: HttpMethod.Delete,
       handler: this.deleteFavorite,
+      middlewares: [new PrivateRouteMiddleware()],
     });
 
     this.addRoute({
@@ -94,7 +102,7 @@ export class OfferController extends BaseController {
   }
 
   public async create(
-    { body }: CreateOfferRequest,
+    { body, tokenPayload }: CreateOfferRequest,
     res: Response
   ): Promise<void> {
     const existOffer = await this.offerService.findByOfferName(body.name);
@@ -107,7 +115,10 @@ export class OfferController extends BaseController {
       );
     }
 
-    const result = await this.offerService.create(body);
+    const result = await this.offerService.create({
+      ...body,
+      authorId: tokenPayload.id,
+    });
     this.created(res, fillDTO(OfferRdo, result));
   }
 

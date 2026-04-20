@@ -6,7 +6,6 @@ import {
   IsDateString,
   IsEnum,
   IsInt,
-  IsMongoId,
   IsString,
   Max,
   MaxLength,
@@ -90,7 +89,6 @@ export class CreateOfferDto {
   })
   public features: OfferFeatureType[];
 
-  @IsMongoId({ message: CreateOfferValidationMessage.userId.invalidId })
   public authorId: string;
 
   @IsArray({ message: CreateOfferValidationMessage.coordinates.invalidFormat })
