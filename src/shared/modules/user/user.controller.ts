@@ -20,7 +20,6 @@ import { UserRdo } from './rdo/user.rdo.js';
 import { LoginUserRequest } from './requests/login-user-request.type.js';
 import { LogoutUserRequest } from './requests/logout-user-request.type.js';
 import { RefreshUserRequest } from './requests/refresh-user-request.type.js';
-import { MeUserRequest } from './requests/me-user-request.type.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { LoginUserDto } from './dto/login-user.dto.js';
 import { IAuthService } from '../auth/index.js';
@@ -66,20 +65,6 @@ export class UserController extends BaseController {
       path: '/refresh',
       method: HttpMethod.Post,
       handler: this.refresh,
-      middlewares: [new PrivateRouteMiddleware()],
-    });
-
-    this.addRoute({
-      path: '/me',
-      method: HttpMethod.Get,
-      handler: this.me,
-      middlewares: [new PrivateRouteMiddleware()],
-    });
-
-    this.addRoute({
-      path: '/me/favorites',
-      method: HttpMethod.Get,
-      handler: this.meFavorites,
       middlewares: [new PrivateRouteMiddleware()],
     });
 
@@ -155,15 +140,7 @@ export class UserController extends BaseController {
     this.ok(res, body.token);
   }
 
-  public async me({ body }: MeUserRequest, res: Response): Promise<void> {
-    this.ok(res, { body });
-  }
-
   public async uploadAvatar(req: Request, res: Response): Promise<void> {
     this.created(res, { filepath: req.file?.path });
-  }
-
-  public async meFavorites(req: Request, res: Response): Promise<void> {
-    this.ok(res, req);
   }
 }

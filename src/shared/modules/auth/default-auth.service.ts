@@ -1,8 +1,8 @@
 import { inject, injectable } from 'inversify';
 import { UserEntity, LoginUserDto } from '../user/index.js';
 import { IAuthService } from './auth-service.interface.js';
-import { Component } from '../../types';
-import { ILogger } from '../../libs/logger';
+import { Component } from '../../types/index.js';
+import { ILogger } from '../../libs/logger/index.js';
 import { IUserService } from '../user/user-service.interface.js';
 import { IConfig } from '../../libs/config/config.interface.js';
 import { RestSchema } from '../../libs/config/rest.schema.js';

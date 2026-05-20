@@ -1,4 +1,4 @@
-import { RequestParams, RequestBody } from '../../../libs/rest';
+import { RequestParams, RequestBody } from '../../../libs/rest/index.js';
 import { Request } from 'express';
 import { CreateOfferDto } from '../dto/create-offer.dto.js';
 

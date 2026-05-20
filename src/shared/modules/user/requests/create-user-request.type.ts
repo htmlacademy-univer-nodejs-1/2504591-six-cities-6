@@ -1,5 +1,5 @@
-import { RequestParams, RequestBody } from '../../../libs/rest';
-import { CreateUserDto } from '../dto/create-user.dto';
+import { RequestParams, RequestBody } from '../../../libs/rest/index.js';
+import { CreateUserDto } from '../dto/create-user.dto.js';
 import { Request } from 'express';
 
 export type CreateUserRequest = Request<

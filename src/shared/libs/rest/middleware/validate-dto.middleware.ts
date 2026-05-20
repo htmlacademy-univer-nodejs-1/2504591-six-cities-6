@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { IMiddleware } from './middleware.interface';
+import { IMiddleware } from './middleware.interface.js';
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validate } from 'class-validator';
 import { StatusCodes } from 'http-status-codes';

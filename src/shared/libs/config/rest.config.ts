@@ -1,6 +1,6 @@
 import { config } from 'dotenv';
 import { ILogger } from '../logger/index.js';
-import { IConfig } from './config.interface';
+import { IConfig } from './config.interface.js';
 import { configRestSchema, RestSchema } from './rest.schema.js';
 import { inject, injectable } from 'inversify';
 import { Component } from '../../types/component.enum.js';

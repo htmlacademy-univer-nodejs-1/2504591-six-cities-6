@@ -93,6 +93,12 @@ export class OfferController extends BaseController {
       method: HttpMethod.Get,
       handler: this.getPremium,
     });
+    this.addRoute({
+      path: '/me/favorites',
+      method: HttpMethod.Get,
+      handler: this.favorites,
+      middlewares: [new PrivateRouteMiddleware()],
+    });
   }
 
   public async index(_req: Request, res: Response): Promise<void> {
@@ -162,5 +168,9 @@ export class OfferController extends BaseController {
   public async deleteFavorite(req: Request, res: Response): Promise<void> {
     //нет идей как реализовать
     this.ok(res, req);
+  }
+
+  public async favorites(req: Request, res: Response): Promise<void> {
+    throw new Error();
   }
 }
