@@ -17,13 +17,15 @@ import { OfferRdo } from './rdo/offer.rdo.js';
 import { StatusCodes } from 'http-status-codes';
 import { CreateOfferRequest } from './requests/create-offer-request.type.js';
 import { PatchOfferRequest } from './requests/patch-offer-request.type.js';
+import { IUserService } from '../user/user-service.interface.js';
 
 @injectable()
 export class OfferController extends BaseController {
   constructor(
     @inject(Component.Logger) protected readonly logger: ILogger,
     @inject(Component.OfferService)
-    private readonly offerService: IOfferService
+    private readonly offerService: IOfferService,
+    @inject(Component.UserService) private readonly userService: IUserService
   ) {
     super(logger);
 
@@ -161,16 +163,22 @@ export class OfferController extends BaseController {
   }
 
   public async postFavorite(req: Request, res: Response): Promise<void> {
-    //нет идей как реализовать
-    this.ok(res, req);
+    const offerId = getId(req.params);
+    await this.userService.addFavorite(req.tokenPayload.id, offerId);
+    return this.ok(res, { message: 'Оффер добавлен в избранное' });
   }
 
   public async deleteFavorite(req: Request, res: Response): Promise<void> {
-    //нет идей как реализовать
-    this.ok(res, req);
+    const offerId = getId(req.params);
+    await this.userService.deleteFavorite(req.tokenPayload.id, offerId);
+    return this.ok(res, { message: 'Оффер удален из избранного' });
   }
 
-  public async favorites(req: Request, res: Response): Promise<void> {
-    throw new Error();
+  public async favorites(
+    { tokenPayload }: Request,
+    res: Response
+  ): Promise<void> {
+    const result = await this.userService.getFavorites(tokenPayload.id);
+    this.ok(res, result);
   }
 }
