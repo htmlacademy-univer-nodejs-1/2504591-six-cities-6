@@ -2,6 +2,7 @@ import {
   defaultClasses,
   getModelForClass,
   modelOptions,
+  mongoose,
   prop,
   Ref,
 } from '@typegoose/typegoose';
@@ -43,14 +44,23 @@ export class UserEntity extends defaultClasses.TimeStamps implements User {
   })
   public type: UserType;
 
-  @prop({ required: true, default: '', type: () => String })
+  @prop({
+    type: () => String,
+    required: true,
+    default: '',
+  })
   private _password: string;
 
   public get password() {
     return this._password;
   }
 
-  @prop({ ref: () => OfferEntity, default: [] })
+  @prop({
+    type: () => [mongoose.Schema.Types.ObjectId],
+    ref: () => OfferEntity,
+    _id: false,
+    default: [],
+  })
   public favorites: Ref<OfferEntity>[];
 
   public setPassword(password: string, salt: string) {

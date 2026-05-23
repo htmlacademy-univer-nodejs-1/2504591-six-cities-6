@@ -103,9 +103,21 @@ export class OfferController extends BaseController {
     });
   }
 
-  public async index(_req: Request, res: Response): Promise<void> {
+  public async index({ tokenPayload }: Request, res: Response): Promise<void> {
     const offers = await this.offerService.find();
-    const responseData = fillDTO(OfferRdo, offers);
+    let favoriteIds: string[] = [];
+    if (tokenPayload) {
+      favoriteIds = await this.userService.getFavoriteIds(tokenPayload.id);
+    }
+
+    const offerWithFavotiresFlag = offers.map((offer) => {
+      const offerObject = offer.toObject();
+      return {
+        ...offerObject,
+        isFavorite: favoriteIds.includes(offerObject._id.toString()),
+      };
+    });
+    const responseData = fillDTO(OfferRdo, offerWithFavotiresFlag);
     this.ok(res, responseData);
   }
 

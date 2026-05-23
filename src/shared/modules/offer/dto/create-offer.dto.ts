@@ -56,9 +56,6 @@ export class CreateOfferDto {
   @IsBoolean()
   public isPremium: boolean;
 
-  @IsBoolean()
-  public isFavorite: boolean;
-
   @IsInt()
   @Min(1)
   @Max(5)

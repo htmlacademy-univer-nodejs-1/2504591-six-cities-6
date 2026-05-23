@@ -28,7 +28,7 @@ export class DefaultUserService implements IUserService {
     return res as Promise<DocumentType<UserEntity>>;
   }
 
-  public findById(id: string): Promise<DocumentType<UserEntity> | null> {
+  public findOneById(id: string): Promise<DocumentType<UserEntity> | null> {
     return this.userModel.findOne({ _id: id });
   }
 
@@ -54,11 +54,20 @@ export class DefaultUserService implements IUserService {
   }
 
   public async getFavorites(userId: string): Promise<Ref<OfferEntity>[]> {
-    const existedUser = await this.findById(userId);
+    const existedUser = await this.findOneById(userId);
     if (existedUser) {
       await existedUser.populate('favorites');
     }
     return existedUser?.favorites || [];
+  }
+
+  public async getFavoriteIds(userId: string): Promise<string[]> {
+    const user = await this.findOneById(userId);
+    if (!user || !user.favorites) {
+      return [];
+    }
+    this.logger.info(user.favorites.toString());
+    return [...user.favorites].map((favorite) => favorite.toString());
   }
 
   public async deleteFavorite(userId: string, offerId: string): Promise<void> {
