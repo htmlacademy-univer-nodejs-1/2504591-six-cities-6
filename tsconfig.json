@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2020",
-    "module": "ESNext",
-    "moduleResolution": "Node",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
@@ -18,7 +20,6 @@
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "sourceMap": true,
-    "outDir": "./dist",
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
     "types": [
@@ -37,5 +38,6 @@
   ],
   "ts-node": {
     "esm": true
-  }
+  },
+    "files": ["./custom.d.ts"]
 }

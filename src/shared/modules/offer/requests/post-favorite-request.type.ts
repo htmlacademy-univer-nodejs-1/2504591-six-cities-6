@@ -1,9 +1,9 @@
 import { RequestParams, RequestBody } from '../../../libs/rest/index.js';
-import { CreateUserDto } from '../dto/create-user.dto.js';
 import { Request } from 'express';
+import { PostFavotiteDto } from '../dto/post-favorite.dto.js';
 
-export type CreateUserRequest = Request<
+export type PostFavoriteRequest = Request<
   RequestParams,
   RequestBody,
-  CreateUserDto
+  PostFavotiteDto
 >;

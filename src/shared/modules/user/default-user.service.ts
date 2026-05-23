@@ -1,11 +1,12 @@
 import { IUserService } from './user-service.interface.js';
-import { DocumentType, types } from '@typegoose/typegoose';
+import { DocumentType, Ref, types } from '@typegoose/typegoose';
 import { UserEntity } from './user.entity.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { inject, injectable } from 'inversify';
 import { Component } from '../../types/component.enum.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { User } from '../../types/index.js';
+import { OfferEntity } from '../offer/offer.entity.js';
 
 @injectable()
 export class DefaultUserService implements IUserService {
@@ -27,8 +28,8 @@ export class DefaultUserService implements IUserService {
     return res as Promise<DocumentType<UserEntity>>;
   }
 
-  public findById(id: string): Promise<DocumentType<UserEntity> | null> {
-    return this.userModel.findOne({ id });
+  public findOneById(id: string): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel.findOne({ _id: id });
   }
 
   public findByEmail(email: string): Promise<DocumentType<UserEntity> | null> {
@@ -44,5 +45,34 @@ export class DefaultUserService implements IUserService {
       return existedUser;
     }
     return this.create(dto, salt);
+  }
+
+  public async addFavorite(userId: string, offerId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $addToSet: { favorites: offerId },
+    });
+  }
+
+  public async getFavorites(userId: string): Promise<Ref<OfferEntity>[]> {
+    const existedUser = await this.findOneById(userId);
+    if (existedUser) {
+      await existedUser.populate('favorites');
+    }
+    return existedUser?.favorites || [];
+  }
+
+  public async getFavoriteIds(userId: string): Promise<string[]> {
+    const user = await this.findOneById(userId);
+    if (!user || !user.favorites) {
+      return [];
+    }
+    this.logger.info(user.favorites.toString());
+    return [...user.favorites].map((favorite) => favorite.toString());
+  }
+
+  public async deleteFavorite(userId: string, offerId: string): Promise<void> {
+    await this.userModel.findByIdAndUpdate(userId, {
+      $pull: { favorites: offerId },
+    });
   }
 }

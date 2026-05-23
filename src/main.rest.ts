@@ -7,6 +7,7 @@ import { Component } from './shared/types/component.enum.js';
 import { createUserContainer } from './shared/modules/user/user.container.js';
 import { createOfferContainer } from './shared/modules/offer/offer.container.js';
 import { createCommentContainer } from './shared/modules/comment/index.js';
+import { createAuthContainer } from './shared/modules/auth/index.js';
 
 async function bootstrap() {
   const appContainer = new Container();
@@ -14,6 +15,7 @@ async function bootstrap() {
   appContainer.load(createUserContainer());
   appContainer.load(createOfferContainer());
   appContainer.load(createCommentContainer());
+  appContainer.load(createAuthContainer());
   const app = appContainer.get<RestApplication>(Component.RestApplication);
   await app.init();
 }

@@ -21,7 +21,10 @@ import {
 import { IUserService } from '../../shared/modules/user/user-service.interface.js';
 import { ParsedLine } from '../../shared/types/parsed-line.type.js';
 import { CommentModel } from '../../shared/modules/comment/comment.entity.js';
+import { UserType, UserTypeEnum } from '../../shared/types/user.type.js';
 
+const isUserType = (type: string): type is UserType =>
+  type === UserTypeEnum.Standart || type === UserTypeEnum.Pro;
 export class ImportCommand implements ICommand {
   private offerService: IOfferService;
   private databaseClient: IDatabaseClient;
@@ -47,6 +50,9 @@ export class ImportCommand implements ICommand {
   }
 
   private async saveOffer({ offer, user }: ParsedLine): Promise<void> {
+    if (!isUserType(user.type)) {
+      return;
+    }
     const existingUser = await this.userService.findByEmail(user.email);
     const dbUser =
       existingUser ??
@@ -68,7 +74,7 @@ export class ImportCommand implements ICommand {
       preview: offer.preview,
       images: offer.images,
       isPremium: offer.isPremium,
-      isFavorite: offer.isFavorite,
+      // isFavorite: false,
       rating: offer.rating,
       type: offer.type,
       rooms: offer.rooms,

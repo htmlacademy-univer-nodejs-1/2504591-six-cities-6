@@ -46,7 +46,6 @@ export class TSVOfferGenerator implements IOfferGenerator {
     const preview = getRandomItem<string>(this.mockData.previewImages);
     const images = getRandomItems<string>(this.mockData.photos);
     const isPremium = Math.random() < 0.5;
-    const isFavorite = Math.random() < 0.5;
     const rating = generateRandomInteger(1, 5, 1);
     const type = getRandomItem<string>(this.mockData.types);
     const rooms = generateRandomInteger(1, 5);
@@ -70,7 +69,6 @@ export class TSVOfferGenerator implements IOfferGenerator {
       preview,
       images.join(';'),
       isPremium,
-      isFavorite,
       rating,
       type,
       rooms,
