@@ -12,8 +12,11 @@ import { ILogger, PinoLogger } from '../shared/libs/logger/index.js';
 import { Component } from '../shared/types/index.js';
 import { RestApplication } from './rest.application.js';
 import {
-  AppExpectionFilter,
+  AppExceptionFilter,
+  HttpErrorExceptionFilter,
   IExceptionFilter,
+  PathTransformer,
+  ValidationExceptionFilter,
 } from '../shared/libs/rest/index.js';
 
 export function createRestApplicationContainer(): ContainerModule {
@@ -29,7 +32,17 @@ export function createRestApplicationContainer(): ContainerModule {
       .to(MongoDatabaseClient)
       .inSingletonScope();
     bind<IExceptionFilter>(Component.ExceptionFilter)
-      .to(AppExpectionFilter)
+      .to(AppExceptionFilter)
+      .inSingletonScope();
+    bind<IExceptionFilter>(Component.HttpExceptionFilter)
+      .to(HttpErrorExceptionFilter)
+      .inSingletonScope();
+    bind<IExceptionFilter>(Component.ValidationExceptionFilter)
+      .to(ValidationExceptionFilter)
+      .inSingletonScope();
+
+    bind<PathTransformer>(Component.PathTransformer)
+      .to(PathTransformer)
       .inSingletonScope();
   });
 

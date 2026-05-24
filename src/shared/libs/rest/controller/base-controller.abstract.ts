@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { IController } from './controller.interface.js';
 import { ILogger } from '../../logger/index.js';
 import {
@@ -10,12 +10,22 @@ import {
 } from 'express';
 import { Route } from '../types/route.interface.js';
 import { StatusCodes } from 'http-status-codes';
+import { Component } from '../../../types/component.enum.js';
+import { PathTransformer } from '../transform/path-transformer.js';
 
 const DEFAULT_CONTENT_TYPE = 'application/json';
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
 
 @injectable()
 export abstract class BaseController implements IController {
   private readonly _router: Router;
+
+  @inject(Component.PathTransformer)
+  private pathTranformer: PathTransformer;
+
   constructor(protected readonly logger: ILogger) {
     this._router = Router();
   }
@@ -43,7 +53,11 @@ export abstract class BaseController implements IController {
   }
 
   public send<T>(res: Response, statusCode: number, data: T): void {
-    res.type(DEFAULT_CONTENT_TYPE).status(statusCode).json(data);
+    if (!isRecord(data)) {
+      throw new Error('Incorrect form data');
+    }
+    const modifiedData = this.pathTranformer.execute(data);
+    res.type(DEFAULT_CONTENT_TYPE).status(statusCode).json(modifiedData);
   }
 
   ok<T>(res: Response, data: T): void {
