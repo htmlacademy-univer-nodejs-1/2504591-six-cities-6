@@ -12,6 +12,7 @@ import {
   ParseTokenMiddleware,
 } from '../shared/libs/rest/index.js';
 import { STATIC_FILES_ROUTE, STATIC_UPLOAD_ROUTE } from './rest.constant.js';
+import cors from 'cors';
 
 @injectable()
 export class RestApplication {
@@ -108,6 +109,7 @@ export class RestApplication {
     this.server.use(
       authenticateMiddleware.execute.bind(authenticateMiddleware)
     );
+    this.server.use(cors());
   }
 
   public async _initExceptionFilter() {

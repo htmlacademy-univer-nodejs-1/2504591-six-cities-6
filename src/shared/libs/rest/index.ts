@@ -21,3 +21,5 @@ export * from './types/application-error.enum.js';
 export * from './exception-filter/http-error.exception-filter.js';
 export * from './transform/path-transformer.constant.js';
 export * from './transform/path-transformer.js';
+export * from './middleware/upload-multiple-files.middleware.js';
+export * from './middleware/path-transformer.middleware.js';

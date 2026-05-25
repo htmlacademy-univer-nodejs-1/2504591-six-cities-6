@@ -69,3 +69,6 @@ export function reduceValidationErrors(
 export function getFullServerPath(host: string, port: number) {
   return `http://${host}:${port}`;
 }
+
+export const isObject = (value: unknown): value is Record<string, object> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);

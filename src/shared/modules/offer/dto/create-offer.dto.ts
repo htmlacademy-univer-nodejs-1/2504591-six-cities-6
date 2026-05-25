@@ -46,13 +46,6 @@ export class CreateOfferDto {
   @IsEnum(OfferCityEnum, { message: 'City must be valid' })
   public city: OfferCityType;
 
-  @IsString()
-  public preview: string;
-
-  @IsArray()
-  @IsString({ each: true })
-  public images: string[];
-
   @IsBoolean()
   public isPremium: boolean;
 

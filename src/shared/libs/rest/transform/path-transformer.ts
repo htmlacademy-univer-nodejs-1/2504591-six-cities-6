@@ -11,10 +11,7 @@ import {
   STATIC_FILES_ROUTE,
   STATIC_UPLOAD_ROUTE,
 } from '../../../../rest/index.js';
-import { getFullServerPath } from '../../../helpers/index.js';
-
-const isObject = (value: unknown): value is Record<string, object> =>
-  typeof value === 'object' && value !== null;
+import { getFullServerPath, isObject } from '../../../helpers/index.js';
 
 @injectable()
 export class PathTransformer {

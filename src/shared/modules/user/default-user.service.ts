@@ -7,6 +7,7 @@ import { Component } from '../../types/component.enum.js';
 import { ILogger } from '../../libs/logger/index.js';
 import { OfferEntity } from '../offer/offer.entity.js';
 import { DEFAULT_AVATAR_FILE_NAME } from './user.constant.js';
+import { UpdateUserDto } from './dto/update-user.dto.js';
 
 @injectable()
 export class DefaultUserService implements IUserService {
@@ -15,6 +16,15 @@ export class DefaultUserService implements IUserService {
     @inject(Component.UserModel)
     private readonly userModel: types.ModelType<UserEntity>
   ) {}
+
+  public async updateById(
+    id: string,
+    dto: UpdateUserDto
+  ): Promise<DocumentType<UserEntity> | null> {
+    return this.userModel.findOneAndUpdate({ _id: id }, dto, {
+      returnDocument: 'after',
+    });
+  }
 
   public async create(
     dto: CreateUserDto,
