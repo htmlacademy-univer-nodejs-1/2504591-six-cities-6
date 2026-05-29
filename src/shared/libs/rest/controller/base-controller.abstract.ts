@@ -13,9 +13,14 @@ import { StatusCodes } from 'http-status-codes';
 
 const DEFAULT_CONTENT_TYPE = 'application/json';
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
 @injectable()
 export abstract class BaseController implements IController {
   private readonly _router: Router;
+
   constructor(protected readonly logger: ILogger) {
     this._router = Router();
   }
@@ -43,6 +48,9 @@ export abstract class BaseController implements IController {
   }
 
   public send<T>(res: Response, statusCode: number, data: T): void {
+    if (!isRecord(data)) {
+      throw new Error('Incorrect form data');
+    }
     res.type(DEFAULT_CONTENT_TYPE).status(statusCode).json(data);
   }
 

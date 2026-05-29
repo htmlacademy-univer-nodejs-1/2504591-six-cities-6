@@ -1,6 +1,12 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
-import { HttpError, RequestParams } from '../libs/rest/index.js';
+import {
+  ApplicationError,
+  HttpError,
+  RequestParams,
+  ValidationErrorField,
+} from '../libs/rest/index.js';
 import { StatusCodes } from 'http-status-codes';
+import { ValidationError } from 'class-validator';
 
 export const includes = <T>(array: readonly T[], value: unknown): boolean =>
   (array as readonly unknown[]).includes(value);
@@ -31,9 +37,13 @@ export const getErrorMessage = (error: unknown): string =>
 export const fillDTO = <T, V>(someDTO: ClassConstructor<T>, plainObject: V) =>
   plainToInstance(someDTO, plainObject, { excludeExtraneousValues: true });
 
-export const createErrorObject = (message: string) => ({
-  error: message,
-});
+export function createErrorObject(
+  errorType: ApplicationError,
+  error: string,
+  details: ValidationErrorField[] = []
+) {
+  return { errorType, error, details };
+}
 
 export const getId = (params: RequestParams): string => {
   const { offerId } = params;
@@ -45,3 +55,20 @@ export const getId = (params: RequestParams): string => {
   }
   return offerId;
 };
+
+export function reduceValidationErrors(
+  errors: ValidationError[]
+): ValidationErrorField[] {
+  return errors.map(({ property, value, constraints }) => ({
+    property,
+    value,
+    messages: constraints ? Object.values(constraints) : [],
+  }));
+}
+
+export function getFullServerPath(host: string, port: number) {
+  return `http://${host}:${port}`;
+}
+
+export const isObject = (value: unknown): value is Record<string, object> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value);

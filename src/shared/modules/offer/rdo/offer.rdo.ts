@@ -26,7 +26,10 @@ export class OfferRdo {
   public type: string;
 
   @Expose()
-  public image: string;
+  public preview: string;
+
+  @Expose()
+  public images: string[];
 
   @Expose()
   public rooms: number;

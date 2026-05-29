@@ -28,14 +28,15 @@ Content-Type: application/json
 
 ## Отправить изображение
 
-POST http://localhost:4000/users/62823cb2c5a64ce9f1b50eb6/avatar HTTP/1.1
+POST http://localhost:4000/users/69da6114839b90e774b8d6f0/avatar HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJlbWFpbCI6InRvcmFuc0BvdmVybG9vay5uZXQiLCJuYW1lIjoiSmVmcmV5IEVwc3RpbmUiLCJpZCI6IjY5ZGE2MTE0ODM5YjkwZTc3NGI4ZDZmMCIsImlhdCI6MTc3OTY5OTUxMCwiZXhwIjoxNzc5ODcyMzEwfQ._8wwVKW-RwRXdj6bUHPUO5OC7ZFZ7L20LmK4batkRtg
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
-Content-Disposition: form-data; name="avatar"; filename="screen.png"
+Content-Disposition: form-data; name="avatar"; filename="default-avatar.jpg"
 Content-Type: image/png
 
-< /Users/spider_net/Desktop/screen.png
+< ../../../../static/default-avatar.jpg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ###
